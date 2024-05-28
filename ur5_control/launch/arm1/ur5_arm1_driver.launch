@@ -1,0 +1,28 @@
+<?xml version="1.0"?>
+<launch>
+  <arg name="debug" default="false" doc="Debug flag that will get passed on to ur_common.launch"/>
+  <arg name="robot_ip" doc="IP address by which the robot can be reached."/>
+  <arg name="reverse_ip" default="" doc="IP of the driver, if set to empty it will detect it automatically."/>
+  <arg name="reverse_port" default="50001" doc="Port that will be opened by the driver to allow direct communication between the driver and the robot controller."/>
+  <arg name="script_sender_port" default="50002" doc="The driver will offer an interface to receive the program's URScript on this port. If the robot cannot connect to this port, `External Control` will stop immediately."/>
+  <arg name="trajectory_port" default="50003" doc="Port that will be opened by the driver to allow trajectory forwarding."/>
+  <arg name="script_command_port" default="50004" doc="Port that will be opened by the driver to allow forwarding script commands to the robot."/>
+  <arg name="tf_prefix" default="arm1_" doc="tf_prefix used for the robot."/>
+  <arg name="controllers" default="arm1_joint_state_controller arm1_scaled_pos_joint_traj_controller arm1_speed_scaling_state_controller arm1_force_torque_sensor_controller" doc="Controllers that are activated by default."/>
+  <arg name="stopped_controllers" default="arm1_pos_joint_traj_controller arm1_joint_group_vel_controller" doc="Controllers that are initally loaded, but not started."/>
+  <arg name="controller_config_file" default="$(find ur5_control)/controller/driver/ur5_driver_arm1_controllers.yaml" doc="Config file used for defining the ROS-Control controllers."/>
+  <arg name="robot_description_file" default="$(find ur5_control)/launch/inc/load_ur5.launch.xml" doc="Robot description launch file."/>
+  <arg name="kinematics_config" default="$(find ur_description)/config/ur5/default_kinematics.yaml" doc="Kinematics config file used for calibration correction. This will be used to verify the robot's calibration is matching the robot_description."/>
+  <arg name="headless_mode" default="false" doc="Automatically send URScript to robot to execute. On e-Series this does require the robot to be in 'remote-control' mode. With this, the URCap is not needed on the robot."/>
+  <arg name="ur_hardware_interface_node_required" default="true" doc="Shut down ros environment if ur_hardware_interface-node dies."/>
+  
+  <arg name="ur5_urdf_file" default="$(find ur5_control)/urdf/pedestal_with_realsense/ur5_pedestal_with_realsense_gazebo.xacro"/>
+  
+  <include file="$(find ur5_control)/launch/inc/ur_common.launch" pass_all_args="true">
+    <arg name="use_tool_communication" value="false"/>
+    <arg name="ur5_urdf_file" default="$(arg ur5_urdf_file)"/>
+    <arg name="tf_prefix" default="$(arg tf_prefix)" />
+    <arg name="controller_config_file" default="$(arg controller_config_file)" />
+    <arg name="controllers" default="$(arg controllers)" />
+  </include>
+</launch>

@@ -1,0 +1,60 @@
+<?xml version="1.0"?>
+<launch>
+
+  <arg name="sim" default="false" />
+  <arg name="world" default="B75.world"/>
+  <arg name="robot_ip" default="192.168.42.121"/>
+  <arg name="kinematics_config" default="$(find ur5_control)/calibration/ur5_calibration.yaml"/>
+  <arg name="ur5_setup" default="standard"/>
+  
+  <!-- Select correct URDF file for the setup type -->
+  <arg name="ur5_urdf_file" value="$(find ur5_control)/urdf/standard_ur5/ur5_gazebo.xacro" unless="$(eval arg('ur5_setup') != 'standard')"/>
+
+  <arg name="ur5_urdf_file" value="$(find ur5_control)/urdf/standard_pedestal/ur5_ur5_control.xacro" if="$(eval arg('ur5_setup') == 'pedestal')" />
+  
+  <arg name="ur5_urdf_file" value="$(find ur5_control)/urdf/pedestal_with_bracket/ur5_pedestal_with_bracket_gazebo.xacro" if="$(eval arg('ur5_setup') == 'bracket')" />
+ 
+ <arg name="ur5_urdf_file" value="$(find ur5_control)/urdf/pedestal_with_realsense/ur5_pedestal_with_realsense_gazebo.xacro" if="$(eval arg('ur5_setup') == 'realsense')" />
+ 
+ <!-- Launch Realsense driver this camera is being used -->
+  <group if="$(eval arg('ur5_setup') == 'realsense')">
+  	<group if="$(eval arg('sim') == false)">
+  		<include file="$(find ur5_control)/launch/single/rs_aligned_depth.launch">
+		 	<arg name="color_width" value="1920" />
+		 	<arg name="color_height" value="1080" />
+		 	<arg name="color_fps" value="30" />
+		</include>
+  	</group>
+
+  </group>
+  
+  <!-- Start Moveit path planning and Rviz -->
+  <include file="$(find ur5_control)/launch/single/ur5_moveit_execution.launch">
+  	<arg name="sim" value="$(arg sim)"/>
+  	<arg name="debug" value="false"/>
+  	<arg name="ur5_setup" value="$(arg ur5_setup)"/>
+  </include>
+  
+  <!-- Start Rviz -->
+  <include file="$(find ur5_control)/launch/single/moveit_rviz.launch">
+  	<arg name="rviz_config" value="$(find ur5_control)/launch/single/moveit_with_cam.rviz"/>
+  </include>
+ 
+  <!-- Start Gazebo Simulation-->
+  <group if="$(arg sim)">
+	  <include file="$(find ur5_control)/launch/single/ur5_gazebo.launch">
+	  	<arg name="gazebo_world" value="$(find ur5_control)/worlds/$(arg world)"/>
+	  	<arg name="ur5_urdf_file" value="$(arg ur5_urdf_file)"/>
+	  </include>
+  </group>
+  
+  <!-- Execute Real-life UR5 driver -->
+  <group if="$(eval arg('sim') == false)">
+	<include file="$(find ur5_control)/launch/single/ur5_driver.launch">
+		<arg name="robot_ip" value="$(arg robot_ip)"/>
+		<arg name="kinematics_config" value="$(arg kinematics_config)"/>
+		<arg name="ur5_urdf_file" value="$(arg ur5_urdf_file)" />
+	</include>
+  </group>
+  
+</launch>

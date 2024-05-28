@@ -1,0 +1,122 @@
+<?xml version="1.0"?>
+  <robot xmlns:xacro="http://wiki.ros.org/xacro" name="myur5">
+
+  <!--<xacro:include filename="$(find myur5_description)/urdf/myur5.gazebo" />
+  <xacro:include filename="$(find myur5_description)/urdf/materials.xacro" />-->
+
+  <xacro:include filename="$(find ur_gazebo)/urdf/ur_macro.xacro"/>
+
+  <xacro:include filename="$(find ur_description)/urdf/inc/ur5_macro.xacro"/>
+
+  <xacro:property name="floor_radius" value="1.5"/>
+  <xacro:property name="setup_z" value="2.0"/>
+  
+  <xacro:property name="gantry_thickness" value="0.2"/>
+
+  <xacro:property name="collision_offset" value="0.005"/>
+  
+  <link name="world"/>
+
+  <link name="circular_gantry_floor">
+    <inertial>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <mass value="20"/>
+      <inertia ixx="200" ixy="200" ixz="200" iyy="200" iyz="200" izz="200"/>
+    </inertial>
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+	<cylinder radius="${floor_radius}" length="${gantry_thickness}"/>
+      </geometry>
+      <material name="Gray">
+	<color rgba="0.5 0.5 0.5 1"/>
+      </material>
+    </visual>
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+	<cylinder radius="${floor_radius}" length="${gantry_thickness}"/>
+      </geometry>
+    </collision>
+  </link>
+
+  <link name="gantry_floor_connector">
+    <inertial>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <mass value="20"/>
+      <inertia ixx="200" ixy="200" ixz="200" iyy="200" iyz="200" izz="200"/>
+    </inertial>
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+	<cylinder radius="0.1" length="0.1"/>
+      </geometry>
+      <material name="Gray">
+	<color rgba="0.5 0.5 0.5 1"/>
+      </material>
+    </visual>
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+	<cylinder radius="0.1" length="0.1"/>
+      </geometry>
+    </collision>
+  </link>
+
+ <joint name="world_joint" type="fixed">
+    <parent link="world" />
+    <child link="gantry_floor_connector" />
+    <origin xyz="0 0 0" rpy="0.0 0.0 0.0"/>
+  </joint>
+
+ <joint name="gantry_connector_joint" type="continuous">
+    <parent link="gantry_floor_connector" />
+    <child link="circular_gantry_floor" />
+    <origin xyz="0 0 0.15" rpy="0.0 0.0 0.0"/>
+
+    <axis xyz="0 0 1"/>
+  </joint>
+
+  <link name="gantry_piller">
+    <inertial>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <mass value="20"/>
+      <inertia ixx="200" ixy="200" ixz="200" iyy="200" iyz="200" izz="200"/>
+    </inertial>
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+	<box size="${gantry_thickness} ${gantry_thickness} ${setup_z}"/>
+      </geometry>
+      <material name="Gray">
+	<color rgba="0.5 0.5 0.5 1"/>
+      </material>
+    </visual>
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+	<box size="${gantry_thickness} ${gantry_thickness} ${setup_z}"/>
+      </geometry>
+    </collision>
+  </link>
+
+ <joint name="floor_joint" type="fixed">
+    <parent link="circular_gantry_floor" />
+    <child link="gantry_piller" />
+    <origin xyz="0 ${floor_radius-gantry_thickness/2} ${setup_z/2 + gantry_thickness/2 + collision_offset}" rpy="0.0 0.0 0.0"/>
+  </joint>
+  
+  <xacro:ur5_robot prefix="" />
+
+  <joint name="base_joint" type="prismatic">
+    <parent link="gantry_piller" />
+    <child link="base_link" /> 
+    <origin xyz="0 ${-gantry_thickness/2 - collision_offset} 0" rpy="${pi/2} 0 0"/>
+
+    <axis xyz="0 1 0"/>
+
+    <limit effort="1000.0" lower="0" upper="${setup_z/2 - 0.1}" velocity="0.5"/>
+  </joint>
+
+</robot>
+

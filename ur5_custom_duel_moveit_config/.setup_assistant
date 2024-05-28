@@ -1,0 +1,11 @@
+moveit_setup_assistant_config:
+  URDF:
+    package: ur5_control
+    relative_path: urdf/duel_ur5_custom/ur5_duel.urdf.xacro
+    xacro_args: ""
+  SRDF:
+    relative_path: config/ur5_duel.srdf
+  CONFIG:
+    author_name: Lewis Stuart
+    author_email: lewis.stuart11@uahoo.co.uk
+    generated_timestamp: 1697735018

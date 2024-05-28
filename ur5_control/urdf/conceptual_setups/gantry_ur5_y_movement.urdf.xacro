@@ -1,0 +1,162 @@
+<?xml version="1.0"?>
+  <robot xmlns:xacro="http://wiki.ros.org/xacro" name="myur5">
+
+  <!--<xacro:include filename="$(find myur5_description)/urdf/myur5.gazebo" />
+  <xacro:include filename="$(find myur5_description)/urdf/materials.xacro" />-->
+
+  <xacro:include filename="$(find ur_gazebo)/urdf/ur_macro.xacro"/>
+
+  <xacro:include filename="$(find ur_description)/urdf/inc/ur5_macro.xacro"/>
+
+  <xacro:property name="setup_x" value="1.5"/>
+  <xacro:property name="setup_y" value="1.5"/>
+  <xacro:property name="setup_z" value="2.0"/>
+  
+  <xacro:property name="gantry_thickness" value="0.2"/>
+
+  <xacro:property name="collision_offset" value="0.005"/>
+  
+  <xacro:property name="movement_restriction_x" value="0"/>
+  <xacro:property name="movement_restriction_y" value="0"/>
+
+  
+  <xacro:macro name="piller" params="num x y">
+	<link name="gantry_piller_${num}">
+	    <inertial>
+	      <origin xyz="0 0 ${setup_z/2}" rpy="0 0 0"/>
+	      <mass value="20"/>
+	      <inertia ixx="200" ixy="200" ixz="200" iyy="200" iyz="200" izz="200"/>
+	    </inertial>
+	    <visual>
+	      <origin xyz="0 0 ${setup_z/2}" rpy="0 0 0"/>
+	      <geometry>
+		<box size="${gantry_thickness} ${gantry_thickness} ${setup_z}"/>
+	      </geometry>
+	      <material name="Gray">
+		<color rgba="0.5 0.5 0.5 1"/>
+	      </material>
+	    </visual>
+	    <collision>
+	      <origin xyz="0 0 ${setup_z/2}" rpy="0 0 0"/>
+	      <geometry>
+		<box size="${gantry_thickness} ${gantry_thickness} ${setup_z}"/>
+	      </geometry>
+	    </collision>
+	  </link>
+
+         <joint name="world_joint_${num}" type="fixed">
+	    <parent link="world" />
+	    <child link="gantry_piller_${num}" />
+	    <origin xyz="${x*setup_x} ${y*setup_y} 0" rpy="0.0 0.0 0.0"/>
+	  </joint>
+
+  </xacro:macro>
+	
+  <xacro:piller num="1" x="1" y="1"/>
+  <xacro:piller num="2" x="-1" y="1"/>
+  <xacro:piller num="3" x="-1" y="-1"/>
+  <xacro:piller num="4" x="1" y="-1"/>
+
+  <link name="world"/>
+
+  <link name="gantry_connector_1">
+    <inertial>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <mass value="20"/>
+      <inertia ixx="200" ixy="200" ixz="200" iyy="200" iyz="200" izz="200"/>
+    </inertial>
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <box size="${setup_x*2 - gantry_thickness} ${gantry_thickness} ${gantry_thickness}"/>
+      </geometry>
+      <material name="Gray">
+        <color rgba="0 0 0"/>
+      </material>
+    </visual>
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <box size="${setup_x*2 - gantry_thickness - collision_offset} ${gantry_thickness} ${gantry_thickness}"/>
+      </geometry>
+    </collision>
+  </link>
+
+  <joint name="gantry_connector1_joint" type="fixed">
+    <parent link="gantry_piller_1" />
+    <child link="gantry_connector_1" />
+    <origin xyz="-${setup_x} 0 ${setup_z - gantry_thickness/2}" rpy="0.0 0.0 0.0"/>
+  </joint>
+
+  <link name="gantry_connector_2">
+    <inertial>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <mass value="20"/>
+      <inertia ixx="200" ixy="200" ixz="200" iyy="200" iyz="200" izz="200"/>
+    </inertial>
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <box size="${setup_x*2 - gantry_thickness} ${gantry_thickness} ${gantry_thickness}"/>
+      </geometry>
+      <material name="Gray">
+        <color rgba="0 0 0"/>
+      </material>
+    </visual>
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <box size="${setup_x*2 - gantry_thickness - collision_offset} ${gantry_thickness} ${gantry_thickness}"/>
+      </geometry>
+    </collision>
+  </link>
+
+  <joint name="gantry_connector2_joint" type="fixed">
+    <parent link="gantry_connector_1" />
+    <child link="gantry_connector_2" />
+    <origin xyz="0 -${2*setup_y} 0" rpy="0.0 0.0 0.0"/>
+  </joint>
+
+  <link name="main_gantry_connector">
+    <inertial>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <mass value="20"/>
+      <inertia ixx="200" ixy="200" ixz="200" iyy="200" iyz="200" izz="200"/>
+    </inertial>
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <box size="${gantry_thickness} ${setup_y*2 - gantry_thickness} ${gantry_thickness}"/>
+      </geometry>
+      <material name="Gray">
+        <color rgba="0 0 0"/>
+      </material>
+    </visual>
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <box size="${gantry_thickness} ${setup_y*2 - gantry_thickness - collision_offset} ${gantry_thickness}"/>
+      </geometry>
+    </collision>
+  </link>
+
+  <joint name="main_gantry_joint" type="fixed">
+    <parent link="gantry_connector_1" />
+    <child link="main_gantry_connector" />
+    <origin xyz="0 -${setup_y} 0.0" rpy="0.0 0.0 0.0"/>
+  </joint>
+  
+  <xacro:ur5_robot prefix="" />
+
+  <joint name="base_joint" type="prismatic">
+    <parent link="main_gantry_connector" />
+    <child link="base_link" />
+    <origin xyz="0 0 -${gantry_thickness/2 + collision_offset}" rpy="${pi} 0.0 0.0"/>
+
+    <axis xyz="0 1 0"/>
+
+    <limit effort="1000.0" lower="-${setup_y-movement_restriction_y}" upper="${setup_y-movement_restriction_y}" velocity="0.5"/>
+  </joint>
+ 
+</robot>
+

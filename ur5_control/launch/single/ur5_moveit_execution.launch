@@ -1,0 +1,34 @@
+<?xml version="1.0"?>
+<launch>
+  <arg name="sim" default="false" />
+  <arg name="debug" default="false" />
+  
+  <arg name="ur5_setup" default="standard" />
+
+  <!-- Remap follow_joint_trajectory -->
+  <remap if="$(arg sim)" from="/scaled_pos_joint_traj_controller/follow_joint_trajectory" to="/eff_joint_traj_controller/follow_joint_trajectory"/>
+  
+  <group if="$(eval arg('ur5_setup') == 'standard')">
+  	<include file="$(find ur5_moveit_config)/launch/move_group.launch">
+	    	<arg name="debug" default="$(arg debug)" />
+	  </include>
+  </group>
+  
+  <group if="$(eval arg('ur5_setup') == 'pedestal')">
+  	<!-- ADD MOVEIT CONFIG -->
+  </group>
+  
+  <group if="$(eval arg('ur5_setup') == 'bracket')">
+  	<!-- ADD MOVEIT CONFIG -->
+  </group>
+  
+  <group if="$(eval arg('ur5_setup') == 'realsense')">
+	  <include file="$(find pedestal_with_realsense_ur5_moveit_config)/launch/move_group.launch">
+	    	<arg name="debug" default="$(arg debug)" />
+	  </include>
+	  
+	  <!--<include file="$(find ur5_custom_arm1_moveit_config)/launch/move_group.launch">
+	    	<arg name="debug" default="$(arg debug)" />
+	  </include>-->
+  </group>
+</launch>

@@ -1,0 +1,57 @@
+<?xml version="1.0"?>
+<launch>
+
+  <arg name="sim" default="false" />
+  <arg name="world" default="worlds/empty.world"/> <!-- -->
+  <arg name="robot_ip" default="192.168.42.122"/>
+  <arg name="kinematics_config" default="$(find ur5_control)/calibration/arm2_ur5_calibration.yaml"/>
+  
+  <arg name="ur5_urdf_file" value="$(find ur5_control)/urdf/ur5_arm2/ur5_arm2_gazebo.xacro"/>
+  
+  <arg name="serial_no" default="215222073199"/>
+  
+  <arg name="use_ros_realsense" default="false" />
+  
+  <arg name="rviz_config_file" default="moveit_without_cam.rviz" unless="$(eval arg('use_ros_realsense') == true)"/>
+  <arg name="rviz_config_file" value="moveit_with_cam.rviz" if="$(eval arg('use_ros_realsense') == true)" />
+ 
+ <!-- Launch Realsense driver this camera is being used -->
+  <group if="$(eval arg('use_ros_realsense') == true)">
+  	<group if="$(eval arg('sim') == false)">
+  		<include file="$(find ur5_control)/launch/rs_aligned_depth.launch">
+		 	<arg name="color_width" value="1920" />
+		 	<arg name="color_height" value="1080" />
+		 	<arg name="color_fps" value="30" />
+		 	<arg name="tf_prefix" value="arm2" />
+		 	<arg name="camera" value="arm2_camera" />
+		 	<arg name="serial_no" value="$(arg serial_no)" />
+		</include>
+  	</group>
+  </group>
+  
+  <include file="$(find ur5_control)/launch/arm2/ur5_arm2_moveit_execution.launch">
+  	<arg name="sim" value="$(arg sim)"/>
+  	<arg name="debug" value="false"/>
+  </include>
+
+  <include file="$(find ur5_control)/launch/arm2/moveit_arm2_rviz.launch">
+  	<arg name="rviz_config" value="$(find ur5_control)/launch/arm2/$(arg rviz_config_file)"/>
+  </include>
+ 
+  <group if="$(arg sim)">
+	  <include file="$(find ur5_control)/launch/arm2/ur5_arm2_gazebo.launch">
+	  	<arg name="gazebo_world" value="$(find ur5_control)/worlds/$(arg world)"/>
+	  	<arg name="ur5_urdf_file" value="$(arg ur5_urdf_file)"/>
+	  </include>
+  </group>
+  
+  <group if="$(eval arg('sim') == false)">
+	<include file="$(find ur5_control)/launch/arm2/ur5_arm2_driver.launch">
+		<arg name="robot_ip" value="$(arg robot_ip)"/>
+		<arg name="kinematics_config" value="$(arg kinematics_config)"/>
+		<arg name="ur5_urdf_file" value="$(arg ur5_urdf_file)" />
+		<arg name="tf_prefix" value="arm2_" />
+	</include>
+  </group>
+  
+</launch>

@@ -1,0 +1,16 @@
+<?xml version="1.0"?>
+  <robot xmlns:xacro="http://wiki.ros.org/xacro" name="$(arg robot_model)_robot">
+  
+  <xacro:include filename="$(find ur_gazebo)/urdf/ur_macro.xacro"/>
+  
+  <xacro:include filename="$(find ur5_control)/urdf/ur5_arm2/ur5_arm2_macro_gazebo.xacro"/>
+  
+  <link name="world"/>
+
+  <joint name="arm2_world_joint" type="fixed">
+    <parent link="world" />
+    <child link="arm2_pedestal" /> <!--<origin xyz="0.8585 0.4605 0" rpy="0.0 0.0 ${pi/2 - 0.03475}"/>-->
+    <origin xyz="0.8585 0.4605 0" rpy="0.0 0.0 ${pi/2 - 0.03475}"/>
+  </joint>
+
+</robot>

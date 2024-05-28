@@ -1,0 +1,129 @@
+<?xml version="1.0"?>
+  <robot xmlns:xacro="http://wiki.ros.org/xacro" name="ur5_pedestal">
+  
+  <xacro:property name="pedestal_base_height" value="0.845"/>
+  
+  <xacro:include filename="$(find ur_gazebo)/urdf/ur_macro.xacro"/>
+  <xacro:include filename="$(find ur_description)/urdf/inc/ur5_macro.xacro"/>
+
+  <link name="world"/>
+
+  <link name="pedestal">
+    <inertial>
+      <origin rpy="0 0 0" xyz="0 0 ${pedestal_base_height/2}"/>
+      <mass value="20"/>
+      <inertia ixx="200" ixy="200" ixz="200" iyy="200" iyz="200" izz="200"/>
+    </inertial>
+    <visual>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <geometry>
+        <mesh filename="package://ur5_control/meshes/b75_pedestal.dae"/>
+      </geometry>
+      <material name="Gray">
+        <color rgba="0.5 0.5 0.5 1"/>
+      </material>
+    </visual>
+    <collision>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <geometry>
+        <mesh filename="package://ur5_control/meshes/b75_pedestal.dae"/>
+      </geometry>
+    </collision>
+  </link>
+
+  <xacro:ur5_robot prefix="" />
+
+  <joint name="world_joint" type="fixed">
+    <parent link="world" />
+    <child link="pedestal" />
+    <origin xyz="0 0 0" rpy="0.0 0.0 0.0"/>
+  </joint>
+
+  <joint name="base_joint" type="fixed">
+    <parent link="pedestal" />
+    <child link="base_link" />
+    <origin xyz="0 0 ${pedestal_base_height}" rpy="0.0 0.0 0.0"/>
+  </joint>
+  
+  <link name="tool0_controller"/>
+  <joint name="tool_controller_fake_joint" type="fixed">
+    <parent link="tool0"/>
+    <child link="tool0_controller"/>
+    <origin xyz="0 0 0" rpy="0 0 0"/>
+  </joint>
+  
+  <xacro:property name="bracket_x" value="0.075"/>
+  <xacro:property name="bracket_y" value="0.075"/>
+  <xacro:property name="bracket_z" value="0.008"/>
+  
+  <xacro:property name="realsense_d435i_x" value="0.09"/>
+  <xacro:property name="realsense_d435i_y" value="0.025"/>
+  <xacro:property name="realsense_d435i_z" value="0.025"/>
+  
+  <xacro:property name="realsense_d435i_hov" value="69"/>
+  <xacro:property name="realsense_d435i_fps" value="30.0"/>
+  
+  <xacro:property name="realsense_d435i_lens_offset" value="-0.0325"/>
+  
+  <link name="bracket">
+    <inertial>
+      <mass value="1" />
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <inertia ixx="1e-6" ixy="0" ixz="0" iyy="1e-6" iyz="0" izz="1e-6" />
+    </inertial>
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <mesh filename="package://ur5_control/meshes/ur5_realsense_bracket_and_usb_cable.dae"/>
+      </geometry>
+      <material name="Blue">
+        <color rgba="0.1 0.1 0.7 1"/>
+      </material>
+    </visual>
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <mesh filename="package://ur5_control/meshes/ur5_realsense_bracket_and_usb_cable.dae"/>
+      </geometry>
+    </collision>
+  </link>
+  
+  <joint name="bracket_joint" type="fixed">
+    <axis xyz="0 0 1" />
+    <origin xyz="0 0 0" rpy="0 0 0"/>
+    <parent link="tool0_controller"/>
+    <child link="bracket"/>
+  </joint>
+  
+  <!-- Camera -->
+  <link name="camera_link">
+    <inertial>
+      <mass value="1" />
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <inertia ixx="1e-6" ixy="0" ixz="0" iyy="1e-6" iyz="0" izz="1e-6" />
+    </inertial>
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <box size="${realsense_d435i_y} ${realsense_d435i_x} ${realsense_d435i_z}"/>
+      </geometry>
+      <material name="Silver">
+        <color rgba="0.75 0.75 0.75 1"/>
+      </material>
+    </visual>
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <box size="${realsense_d435i_y} ${realsense_d435i_x} ${realsense_d435i_z}"/>
+      </geometry>
+    </collision>
+  </link>
+  
+  <joint name="camera_joint" type="fixed">
+    <axis xyz="0 0 1" />
+    <origin xyz="0 0 ${realsense_d435i_y/2 + bracket_z}" rpy="0 -${pi/2} -${pi/2}"/>
+    <parent link="bracket"/>
+    <child link="camera_link"/>
+  </joint>
+
+</robot>

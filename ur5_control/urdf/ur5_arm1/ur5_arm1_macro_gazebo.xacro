@@ -1,0 +1,211 @@
+<?xml version="1.0"?>
+  <robot xmlns:xacro="http://wiki.ros.org/xacro">
+  
+  <xacro:arg name="joint_limit_params" default=""/>
+  <xacro:arg name="physical_params" default=""/>
+  <xacro:arg name="kinematics_params" default=""/>
+  <xacro:arg name="visual_params" default=""/>
+
+  <xacro:arg name="transmission_hw_interface" default="hardware_interface/EffortJointInterface"/>
+  <xacro:arg name="safety_limits" default="false"/>
+  <xacro:arg name="safety_pos_margin" default="0.15"/>
+  <xacro:arg name="safety_k_position" default="20"/>
+
+  <xacro:ur_robot_gazebo
+    prefix="arm1_"
+    joint_limits_parameters_file="$(arg joint_limit_params)"
+    kinematics_parameters_file="$(arg kinematics_params)"
+    physical_parameters_file="$(arg physical_params)"
+    visual_parameters_file="$(arg visual_params)"
+    transmission_hw_interface="$(arg transmission_hw_interface)"
+    safety_limits="$(arg safety_limits)"
+    safety_pos_margin="$(arg safety_pos_margin)"
+    safety_k_position="$(arg safety_k_position)"
+  />
+  
+  <xacro:property name="arm1_pedestal_base_height" value="1.2"/>
+  
+  <xacro:property name="bracket_x" value="0.075"/>
+  <xacro:property name="bracket_y" value="0.075"/>
+  <xacro:property name="bracket_z" value="0.008"/>
+  
+  <xacro:property name="realsense_d435i_x" value="0.09"/>
+  <xacro:property name="realsense_d435i_y" value="0.025"/>
+  <xacro:property name="realsense_d435i_z" value="0.025"/>
+  
+  <xacro:property name="realsense_d435i_depth_lens_y_offset" value="0.0175"/>
+  <xacro:property name="realsense_d435i_depth_lens_z_offset" value="0.0042"/>
+  
+  <xacro:property name="realsense_d435i_colour_lens_y_offset" value="0.0325"/>
+  
+   <xacro:property name="realsense_d435i_hov" value="70.38"/>
+  <xacro:property name="realsense_d435i_fps" value="30.0"/>
+  
+  <xacro:property name="realsense_d435i_img_width" value="800"/> 
+  <xacro:property name="realsense_d435i_img_height" value="800"/> 
+  
+  <link name="arm1_pedestal">
+    <inertial>
+      <origin rpy="0 0 0" xyz="0 0 ${arm1_pedestal_base_height/2}"/>
+      <mass value="20"/>
+      <inertia ixx="200" ixy="200" ixz="200" iyy="200" iyz="200" izz="200"/>
+    </inertial>
+    <visual>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <geometry>
+        <mesh filename="package://ur5_control/meshes/robot1_pedestal.dae"/>
+      </geometry>
+      <material name="Gray">
+        <color rgba="0.5 0.5 0.5 1"/>
+      </material>
+    </visual>
+    <collision>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <geometry>
+        <mesh filename="package://ur5_control/meshes/robot1_pedestal.dae"/>
+      </geometry>
+    </collision>
+  </link>
+  
+  <joint name="arm1_pedestal_joint" type="fixed">
+    <parent link="arm1_pedestal" />
+    <child link="arm1_base_link" />
+    <origin xyz="0 0 1.2" rpy="0.0 0.0 0.0"/>
+  </joint>
+
+  <link name="arm1_tool0_controller"/>
+  <joint name="arm1_tool_controller_fake_joint" type="fixed">
+    <parent link="arm1_tool0"/>
+    <child link="arm1_tool0_controller"/>
+    <origin xyz="0 0 0" rpy="0 0 0"/>
+  </joint>
+  
+  <link name="arm1_bracket">
+    <inertial>
+      <mass value="1" />
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <inertia ixx="1e-6" ixy="0" ixz="0" iyy="1e-6" iyz="0" izz="1e-6" />
+    </inertial>
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <mesh filename="package://ur5_control/meshes/ur5_realsense_bracket_and_usb_cable.dae"/>
+      </geometry>
+      <material name="Blue">
+        <color rgba="0.1 0.1 0.7 1"/>
+      </material>
+    </visual>
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <mesh filename="package://ur5_control/meshes/ur5_realsense_bracket_and_usb_cable.dae"/>
+      </geometry>
+    </collision>
+  </link>
+  
+  <joint name="arm1_bracket_joint" type="fixed">
+    <axis xyz="0 0 1" />
+    <origin xyz="0 0 0" rpy="0 0 0"/>
+    <parent link="arm1_tool0_controller"/>
+    <child link="arm1_bracket"/>
+  </joint> 	
+  
+  <link name="arm1_camera_obj">
+    <inertial>
+      <mass value="1" />
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <inertia ixx="1e-6" ixy="0" ixz="0" iyy="1e-6" iyz="0" izz="1e-6" />
+    </inertial>
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <box size="${realsense_d435i_y} ${realsense_d435i_x} ${realsense_d435i_z}"/>
+      </geometry>
+      <material name="Silver">
+        <color rgba="0.75 0.75 0.75 1"/>
+      </material>
+    </visual>
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <box size="${realsense_d435i_y} ${realsense_d435i_x} ${realsense_d435i_z}"/>
+      </geometry>
+    </collision>
+  </link>
+  
+  <joint name="arm1_camera_joint" type="fixed">
+    <axis xyz="0 0 1" />
+    <origin xyz="0 0 ${realsense_d435i_y/2 + bracket_z}" rpy="0 -${pi/2} -${pi/2}"/>
+    <parent link="arm1_bracket"/>
+    <child link="arm1_camera_obj"/>
+  </joint>
+  
+  <link name="arm1_camera_link"/>
+  
+  <joint name="arm1_lens_joint" type="fixed">
+    <axis xyz="0 0 1" />
+    <origin xyz="${realsense_d435i_depth_lens_z_offset} ${realsense_d435i_depth_lens_y_offset} 0" rpy="0 0 0"/>
+    <parent link="arm1_camera_obj"/>
+    <child link="arm1_camera_link"/>
+  </joint>
+  
+  <link name="arm1_camera_predicted_colour_lens"/>
+  
+  <!-- <origin xyz="${0.024402308559790253-realsense_d435i_z} ${0.03222713705152273-realsense_d435i_depth_lens_y_offset} 0.00027543478063308223" rpy="0.0032 -0.005 -0.0024"/>-->
+  <joint name="arm1_predicted_lens_joint" type="fixed">
+    <axis xyz="0 0 1" />
+    <origin xyz="${0.024402308559790253-realsense_d435i_z+realsense_d435i_depth_lens_z_offset} 0.03425 0.005" rpy="0.0 0.014 0.0225"/>
+    <parent link="arm1_camera_obj"/>
+    <child link="arm1_camera_predicted_colour_lens"/>
+  </joint>
+  
+   <!-- Added joint for camera control (NOT IN ORIGINAL FILE) -->
+  <link name="arm1_camera_controller"/>
+  
+  <joint name="arm1_camera_controller_joint" type="fixed"> 
+    <axis xyz="0 0 1" />  <!-- <origin xyz="0.0322 0.00027543478063308223 0.024402308559790253" rpy="-0.005 0.0145 0.0032"/>  -->
+    <origin xyz="0.03425 -0.00125 0.024402308559790253" rpy="0.0012 0.0225 0.0"/> <!-- <origin xyz="0.03425 0.006 0.024402308559790253" rpy="0.015 0.0225 0.0"/>  -->
+    
+    <parent link="arm1_tool0_controller"/>
+    <child link="arm1_camera_controller"/>
+  </joint>
+  
+   <gazebo reference="arm1_camera_predicted_colour_lens">
+    <sensor type="camera" name="arm1_camera">
+      <update_rate>${realsense_d435i_fps}</update_rate>
+      <visualize>true</visualize>
+      <camera name="head">
+        <horizontal_fov>${(pi/180) * realsense_d435i_hov}</horizontal_fov>
+        <image> 
+          <width>${realsense_d435i_img_width}</width>
+          <height>${realsense_d435i_img_height}</height>
+          <format>R8G8B8</format>
+        </image>
+        <clip>
+          <near>0.02</near>
+          <far>500</far>
+        </clip>
+        <noise>
+          <type>gaussian</type>
+          <mean>0.0</mean>
+          <stddev>0.000</stddev>
+        </noise>
+      </camera>
+      <plugin name="camera_controller" filename="libgazebo_ros_camera.so">
+        <alwaysOn>true</alwaysOn>
+        <updateRate>0.0</updateRate>
+        <cameraName>arm1_camera/color</cameraName>
+        <imageTopicName>image_raw</imageTopicName>
+        <cameraInfoTopicName>camera_info</cameraInfoTopicName>
+        <frameName>camera_link</frameName>
+        <hackBaseline>0.07</hackBaseline>
+        <distortionK1>0.0</distortionK1>
+        <distortionK2>0.0</distortionK2>
+        <distortionK3>0.0</distortionK3>
+        <distortionT1>0.0</distortionT1>
+        <distortionT2>0.0</distortionT2>
+      </plugin>
+    </sensor>
+  </gazebo>
+
+</robot>

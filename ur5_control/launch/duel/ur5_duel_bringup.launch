@@ -3,7 +3,7 @@
 
   <arg name="sim" default="false" />
   <arg name="world" default="worlds/empty.world"/> 
-  <arg name="robot1_ip" default="192.168.42.121"/>
+  <arg name="robot1_ip" default="192.168.42.121"/> 
   <arg name="robot2_ip" default="192.168.42.122"/>
   
   <arg name="robot1_kinematics_config" default="$(find ur5_control)/calibration/arm1_ur5_calibration.yaml"/>

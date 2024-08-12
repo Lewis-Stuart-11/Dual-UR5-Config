@@ -76,7 +76,8 @@
 		<arg name="ur5_urdf_file" value="$(arg arm2_urdf_file)" />
 		<arg name="tf_prefix" value="arm2_"/>
 	</include>
-
+	
+	<!-- Adds both individual joint state topics to one joint_states topic (required for parallel path planning) --> 
 	<node name="remap_jointstate_1" pkg="topic_tools" type="relay" output="screen" args="arm1/joint_states joint_states"/>
 	<node name="remap_jointstate_2" pkg="topic_tools" type="relay" output="screen" args="arm2/joint_states joint_states"/>
   </group> 

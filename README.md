@@ -1,4 +1,4 @@
-![Showcase of duel robot setup](https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExdm5paXh0Z3lwb29pMGtyOWE1c2hzanFjZzV2emU4cGttazNleWEwdyZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/FE4JcF5CeUyELIEfiE/giphy.gif)
+![Showcase of duel robot setup](https://media0.giphy.com/media/v1.Y2lkPTc5MGI3NjExZG9idWU4M2drcGZjZWF3d2FjZGRlMmdnYTBhZ2c2ZDFydzVqNXk2ZCZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/2FMP6xCDFya9LhVXbs/giphy.gif)
 
 UR5s, and other robot arms, are extremely useful for performing a wide range of complex tasks with high precision. However, controlling these arms can be extremely difficult, with most provided software not providing the enough functionality for dynamic tasks. Meanwhile, MoveIt is an extremely advanced path planning framework that can calculate trajectories for various robots in a wide range of environments. MoveIt also supports control using different programming languages, such as Python and C++, allowing integration into advanced scripts. Overall, MoveIt provides much better functionality than traditional software that comes packaged with the majority of these robot arms.
 
